@@ -37,7 +37,8 @@ export default {
         headers: originOk
           ? Object.assign({}, cors, {
               'Access-Control-Allow-Methods': 'POST, OPTIONS',
-              'Access-Control-Allow-Headers': 'Content-Type',
+              // Reflect requested headers; web3.js sends Content-Type AND a `solana-client` header.
+              'Access-Control-Allow-Headers': request.headers.get('Access-Control-Request-Headers') || 'Content-Type, solana-client',
               'Access-Control-Max-Age': '86400'
             })
           : {}

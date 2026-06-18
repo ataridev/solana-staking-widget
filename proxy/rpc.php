@@ -43,7 +43,8 @@ if ($origin !== '' && $originOk) {
 if ($method === 'OPTIONS') {
     if ($originOk) {
         header('Access-Control-Allow-Methods: POST, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type');
+        // Reflect requested headers; web3.js sends Content-Type AND a `solana-client` header.
+        header('Access-Control-Allow-Headers: ' . ($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'] ?? 'Content-Type, solana-client'));
         header('Access-Control-Max-Age: 86400');
     }
     http_response_code(204);
