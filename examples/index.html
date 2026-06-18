@@ -59,12 +59,12 @@
   <script src="../dist/solana-staking-widget.bundle.js"></script>
   <script>
     var widget = SolanaStakingWidget.mount(document.getElementById('widget'), {
-      vote: 'YOUR_VOTE_ACCOUNT',                   // your validator's vote account (base58)
+      vote: 'o27rnqfNHPwHsRp2xPXXwWzn2q2dGxn6UD4Rt5KMU5h',
       network: 'mainnet',
-      rpc: 'https://api.mainnet-beta.solana.com',  // replace with your endpoint or a /proxy
+      rpc: 'https://api.mainnet-beta.solana.com',  // public RPC (rate-limited); swap for your own / a proxy
       theme: 'dark',
-      validatorName: 'this validator',
-      apy: 5
+      validatorName: 'Stake.Cake',
+      apy: 5.8
     });
 
     var seg = document.getElementById('themeSeg');
