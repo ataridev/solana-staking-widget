@@ -29,22 +29,35 @@ const MAX_BATCH = 10;
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+$origin = $_SERVER['HTTP_ORIGIN'] ?? $_SERVER['HTTP_REFERER'] ?? '';
+$host = $origin !== '' ? (parse_url($origin, PHP_URL_HOST) ?? '') : '';
+$originOk = ($host === '' || in_array($host, ALLOWED_HOSTS, true));
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+if ($origin !== '' && $originOk) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+}
+
+// CORS preflight: a cross-origin JSON POST (e.g. an embed on another domain) sends OPTIONS first.
+if ($method === 'OPTIONS') {
+    if ($originOk) {
+        header('Access-Control-Allow-Methods: POST, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type');
+        header('Access-Control-Max-Age: 86400');
+    }
+    http_response_code(204);
+    exit;
+}
+if ($method !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'POST only']);
     exit;
 }
-
-$origin = $_SERVER['HTTP_ORIGIN'] ?? $_SERVER['HTTP_REFERER'] ?? '';
-$host = $origin !== '' ? (parse_url($origin, PHP_URL_HOST) ?? '') : '';
-if ($host !== '' && !in_array($host, ALLOWED_HOSTS, true)) {
+if (!$originOk) {
     http_response_code(403);
     echo json_encode(['error' => 'Forbidden origin']);
     exit;
-}
-if ($origin !== '') {
-    header('Access-Control-Allow-Origin: ' . $origin);
-    header('Vary: Origin');
 }
 
 $raw = file_get_contents('php://input');
