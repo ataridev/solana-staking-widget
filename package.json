@@ -1,0 +1,28 @@
+{
+  "name": "solana-staking-widget",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Drop-in native Solana staking widget — no backend, no build step. Wallet Standard + legacy wallets, non-custodial.",
+  "keywords": [
+    "solana",
+    "staking",
+    "native-staking",
+    "validator",
+    "stake",
+    "widget",
+    "embed",
+    "web3",
+    "wallet-standard",
+    "defi"
+  ],
+  "license": "MIT",
+  "author": "ataridev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ataridev/solana-staking-widget.git"
+  },
+  "homepage": "https://github.com/ataridev/solana-staking-widget#readme",
+  "bugs": {
+    "url": "https://github.com/ataridev/solana-staking-widget/issues"
+  }
+}
