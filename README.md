@@ -2,7 +2,7 @@
 
 **Drop-in native Solana staking for any website — no backend, no build step, no framework.**
 
-![solana-staking-widget — native Solana staking widget](docs/screenshot-light.png)
+<p align="center"><img src="docs/screenshot-light.png" alt="solana-staking-widget — native Solana staking widget" width="591"></p>
 
 Add a non-custodial staking interface to your validator site with one `<div>` and one `<script>`. The widget builds native **Stake Program** transactions in the browser and the user signs them in their own wallet. You never touch keys or funds.
 
