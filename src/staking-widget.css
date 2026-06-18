@@ -1,0 +1,100 @@
+/*
+ * solana-staking-widget styles (monochrome theme).
+ *
+ * The widget injects these styles automatically. You only need this file if your
+ * Content-Security-Policy forbids injected <style> (e.g. style-src 'self' without
+ * 'unsafe-inline'). In that case include it with the matching id so auto-injection
+ * is skipped:
+ *
+ *   <link id="sol-staking-widget-styles" rel="stylesheet" href="staking-widget.css">
+ *
+ * (Alternatively set window.SolanaStakingWidgetNoAutoStyle = true before the script.)
+ *
+ * Keep in sync with the CSS embedded in staking-widget.js.
+ *
+ * Neutral black/white base; success (green) and error (red) stay semantic for clarity.
+ */
+
+.sw-stake {
+  --sw-bg: #0b0b0c; --sw-surface: #141416; --sw-surface-2: #1c1c1f;
+  --sw-line: rgba(255,255,255,.10); --sw-line-strong: rgba(255,255,255,.22);
+  --sw-text: #fafafa; --sw-muted: #a0a0a8; --sw-muted-2: #6b6b73;
+  --sw-accent: #ffffff; --sw-on-accent: #0a0a0a;
+  --sw-ring: rgba(255,255,255,.18); --sw-hover: rgba(255,255,255,.06);
+  --sw-green: #3ecf8e; --sw-red: #ff6369;
+  --sw-radius: 14px; --sw-radius-sm: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  font-size: 15px; color: var(--sw-text); line-height: 1.5; animation: sw-fade .35s ease both;
+}
+.sw-stake[data-theme="light"] {
+  --sw-bg: #ffffff; --sw-surface: #f7f7f8; --sw-surface-2: #efeff1;
+  --sw-line: rgba(0,0,0,.10); --sw-line-strong: rgba(0,0,0,.18);
+  --sw-text: #0b0b0c; --sw-muted: #52525b; --sw-muted-2: #8a8a93;
+  --sw-accent: #0a0a0a; --sw-on-accent: #ffffff;
+  --sw-ring: rgba(0,0,0,.16); --sw-hover: rgba(0,0,0,.05);
+  --sw-green: #16a34a; --sw-red: #dc2626;
+}
+@keyframes sw-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes sw-spin { to { transform: rotate(360deg); } }
+.sw-stake * { box-sizing: border-box; }
+.sw-stake .sw-btn { position: relative; cursor: pointer; font-weight: 600; font-size: 15px; border: none; border-radius: 999px; padding: 13px 22px; transition: transform .15s, opacity .2s, background .2s, border-color .2s, color .2s; }
+.sw-stake .sw-btn:active { transform: translateY(1px); }
+.sw-stake .sw-btn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
+.sw-stake .sw-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 4px; color: var(--sw-on-accent); background: var(--sw-accent); }
+.sw-stake .sw-btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+.sw-stake .sw-btn-ghost { color: var(--sw-text); background: var(--sw-surface-2); border: 1px solid var(--sw-line-strong); padding: 9px 18px; font-size: 14px; }
+.sw-stake .sw-btn-ghost:hover { border-color: var(--sw-line-strong); background: var(--sw-hover); }
+.sw-stake .sw-connect { margin-bottom: 8px; }
+.sw-stake .sw-connect-hint { color: var(--sw-muted); margin-bottom: 16px; }
+.sw-stake .sw-wallet-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.sw-stake .sw-btn-wallet { display: flex; align-items: center; justify-content: center; gap: 9px; flex: 1 1 0; min-width: 150px; color: var(--sw-text); background: var(--sw-surface-2); border: 1px solid var(--sw-line-strong); }
+.sw-stake .sw-btn-wallet:hover { border-color: var(--sw-line-strong); background: var(--sw-hover); transform: translateY(-2px); }
+.sw-stake .sw-btn-wallet svg { width: 18px; height: 18px; flex: none; }
+.sw-stake .sw-btn-wallet img { width: 18px; height: 18px; border-radius: 5px; flex: none; }
+.sw-stake .sw-no-wallet { color: var(--sw-muted); background: var(--sw-surface-2); border: 1px solid var(--sw-line); border-radius: var(--sw-radius-sm); padding: 16px 18px; }
+.sw-stake .sw-no-wallet a, .sw-stake .sw-status a { color: var(--sw-text); text-decoration: underline; text-underline-offset: 3px; }
+.sw-stake .sw-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.sw-stake .sw-wallet-info { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; color: var(--sw-text); background: var(--sw-surface-2); border: 1px solid var(--sw-line); border-radius: 999px; padding: 6px 14px; }
+.sw-stake .sw-wallet-info img { width: 16px; height: 16px; border-radius: 4px; flex: none; }
+.sw-stake .sw-wallet-info svg { width: 15px; height: 15px; flex: none; color: var(--sw-muted); }
+.sw-stake .sw-wi-addr { color: var(--sw-muted); }
+.sw-stake .sw-wi-copy { display: inline-flex; align-items: center; cursor: pointer; background: none; border: none; padding: 0; margin-left: 2px; color: var(--sw-muted-2); }
+.sw-stake .sw-wi-copy:hover { color: var(--sw-text); }
+.sw-stake .sw-wi-copy svg { width: 14px; height: 14px; }
+.sw-stake .sw-link { cursor: pointer; background: none; border: none; color: var(--sw-muted); font: inherit; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.sw-stake .sw-link:hover { color: var(--sw-text); }
+.sw-stake .sw-balance { position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; margin-bottom: 12px; border-radius: var(--sw-radius-sm); background: var(--sw-surface-2); border: 1px solid var(--sw-line); color: var(--sw-muted); font-size: 13px; }
+.sw-stake .sw-balance::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--sw-accent); }
+.sw-stake .sw-balance-val { font-weight: 700; font-size: 17px; color: var(--sw-text); }
+.sw-stake .sw-field { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: var(--sw-radius-sm); background: var(--sw-surface-2); border: 1px solid var(--sw-line-strong); transition: border-color .2s, box-shadow .2s; }
+.sw-stake .sw-field:focus-within { border-color: var(--sw-accent); box-shadow: 0 0 0 3px var(--sw-ring); }
+.sw-stake .sw-amount { flex: 1; min-width: 0; background: none; border: none; outline: none; color: var(--sw-text); font-weight: 700; font-size: 26px; -moz-appearance: textfield; }
+.sw-stake .sw-amount::placeholder { color: var(--sw-muted-2); }
+.sw-stake .sw-amount::-webkit-outer-spin-button, .sw-stake .sw-amount::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.sw-stake .sw-unit { color: var(--sw-muted); font-weight: 600; font-size: 15px; }
+.sw-stake .sw-chips { display: flex; gap: 8px; margin-top: 10px; }
+.sw-stake .sw-chip { flex: 1; cursor: pointer; font-weight: 600; font-size: 12.5px; color: var(--sw-muted); background: var(--sw-surface-2); border: 1px solid var(--sw-line); border-radius: 8px; padding: 8px 0; transition: border-color .15s, color .15s, background .15s; }
+.sw-stake .sw-chip:hover { color: var(--sw-text); border-color: var(--sw-line-strong); background: var(--sw-hover); }
+.sw-stake .sw-est { margin: 12px 2px 16px; font-size: 13px; color: var(--sw-muted); display: flex; align-items: center; gap: 7px; }
+.sw-stake .sw-est b { color: var(--sw-green); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sw-stake .sw-status { margin-top: 14px; margin-bottom: 6px; padding: 12px 14px; border-radius: var(--sw-radius-sm); font-size: 14px; line-height: 1.5; display: flex; align-items: center; gap: 10px; }
+.sw-stake .sw-pending { color: var(--sw-muted); background: var(--sw-surface-2); border: 1px solid var(--sw-line); }
+.sw-stake .sw-pending::before { content: ""; width: 16px; height: 16px; flex: none; border-radius: 50%; border: 2px solid var(--sw-line-strong); border-top-color: var(--sw-accent); animation: sw-spin .7s linear infinite; }
+.sw-stake .sw-success { color: var(--sw-green); background: var(--sw-surface-2); border: 1px solid var(--sw-line); }
+.sw-stake .sw-success::before { content: "\2713"; flex: none; font-weight: 700; }
+.sw-stake .sw-error { color: var(--sw-red); background: var(--sw-surface-2); border: 1px solid var(--sw-line); }
+.sw-stake .sw-error::before { content: "!"; flex: none; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid currentColor; font-weight: 700; font-size: 11px; }
+.sw-stake .sw-accounts { margin-top: 24px; }
+.sw-stake .sw-accounts-title { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--sw-muted-2); margin-bottom: 12px; }
+.sw-stake .sw-acc { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: var(--sw-radius-sm); background: var(--sw-surface-2); border: 1px solid var(--sw-line); margin-bottom: 10px; transition: transform .2s, border-color .2s; }
+.sw-stake .sw-acc:hover { transform: translateY(-2px); border-color: var(--sw-line-strong); }
+.sw-stake .sw-acc-amt { font-weight: 600; font-size: 16px; color: var(--sw-text); }
+.sw-stake .sw-acc-meta { font-size: 12.5px; color: var(--sw-muted-2); margin-top: 5px; display: flex; align-items: center; gap: 8px; }
+.sw-stake .sw-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--sw-surface); border: 1px solid var(--sw-line); }
+.sw-stake .sw-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.sw-stake .sw-badge.sw-active { color: var(--sw-green); }
+.sw-stake .sw-badge.sw-activating { color: var(--sw-muted); }
+.sw-stake .sw-badge.sw-deactivating { color: var(--sw-muted-2); }
+.sw-stake .sw-badge.sw-inactive { color: var(--sw-text); }
+.sw-stake .sw-acc-wait { font-size: 13px; color: var(--sw-muted-2); }
+@media (prefers-reduced-motion: reduce) { .sw-stake, .sw-stake * { animation: none !important; } }

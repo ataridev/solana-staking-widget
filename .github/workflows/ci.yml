@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Syntax check widget
+        run: node --check src/staking-widget.js
+      - name: Unit tests
+        run: node test/run.js
+      - name: Build bundle
+        run: node build.js
+      - name: Syntax check ESM proxies
+        run: |
+          node --input-type=module --check < proxy/cloudflare-worker.js
+          node --input-type=module --check < proxy/vercel-edge.js
+      - name: Lint PHP proxy (if PHP available)
+        run: php -l proxy/rpc.php || true
