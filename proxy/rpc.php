@@ -27,11 +27,17 @@ const ALLOWED_METHODS = [
 const MAX_BODY_BYTES = 65536;
 const MAX_BATCH = 10;
 
+// Per-IP rate limit (defence in depth against RPC-credit abuse).
+const RATE_MAX = 300;   // requests...
+const RATE_WINDOW = 60; // ...per this many seconds
+
 header('Content-Type: application/json; charset=utf-8');
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? $_SERVER['HTTP_REFERER'] ?? '';
 $host = $origin !== '' ? (parse_url($origin, PHP_URL_HOST) ?? '') : '';
-$originOk = ($host === '' || in_array($host, ALLOWED_HOSTS, true));
+// Fail closed: require a present, allowlisted Origin/Referer. A bare request with
+// neither header (e.g. curl leeching your RPC credits) is rejected, not allowed.
+$originOk = in_array($host, ALLOWED_HOSTS, true);
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($origin !== '' && $originOk) {
@@ -58,6 +64,12 @@ if ($method !== 'POST') {
 if (!$originOk) {
     http_response_code(403);
     echo json_encode(['error' => 'Forbidden origin']);
+    exit;
+}
+if (!rate_limit('rpc_' . client_ip(), RATE_MAX, RATE_WINDOW)) {
+    http_response_code(429);
+    header('Retry-After: ' . RATE_WINDOW);
+    echo json_encode(['error' => 'Rate limit exceeded']);
     exit;
 }
 
@@ -109,3 +121,53 @@ if ($resp === false || $code < 200 || $code >= 300) {
 }
 
 echo $resp;
+
+
+/**
+ * Best-effort client IP. Behind a reverse proxy (nginx, a CDN) REMOTE_ADDR is the
+ * proxy itself, so only THEN do we trust the forwarded address — X-Forwarded-For
+ * is client-supplied and must never be trusted from a public REMOTE_ADDR.
+ */
+function client_ip(): string
+{
+    $remote = $_SERVER['REMOTE_ADDR'] ?? '';
+    $isLocalProxy = in_array($remote, ['127.0.0.1', '::1'], true);
+    if ($isLocalProxy && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $first = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
+        if ($first !== '') {
+            return $first;
+        }
+    }
+    return $remote !== '' ? $remote : 'unknown';
+}
+
+/**
+ * Fixed-window rate limiter keyed by an arbitrary string. Returns true if within
+ * budget, false if it should be rejected. Backed by a lock-protected temp file;
+ * FAILS OPEN if the store is unwritable so a disk issue can't block real traffic.
+ */
+function rate_limit(string $key, int $max, int $window): bool
+{
+    $file = sys_get_temp_dir() . '/solwidget_rl_' . hash('sha256', $key) . '.json';
+    $now  = time();
+    $fh   = @fopen($file, 'c+');
+    if ($fh === false) {
+        return true;                                  // fail open
+    }
+    $allowed = true;
+    if (flock($fh, LOCK_EX)) {
+        $data = json_decode((string) stream_get_contents($fh), true);
+        if (!is_array($data) || (int) ($data['start'] ?? 0) + $window <= $now) {
+            $data = ['start' => $now, 'count' => 0];  // start a fresh window
+        }
+        $data['count']++;
+        $allowed = $data['count'] <= $max;
+        ftruncate($fh, 0);
+        rewind($fh);
+        fwrite($fh, json_encode($data));
+        fflush($fh);
+        flock($fh, LOCK_UN);
+    }
+    fclose($fh);
+    return $allowed;
+}

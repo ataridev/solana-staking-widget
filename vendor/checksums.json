@@ -1,0 +1,5 @@
+{
+  "_comment": "SHA-256 of the vendored, unmodified dependencies. build.js verifies these before bundling so a tampered or accidentally-swapped blob fails the build (and CI). Regenerate with: shasum -a 256 vendor/*.min.js",
+  "buffer.min.js": "989fc3d36b4371b766b753dde670c8e845839af168e4b3985803fb006c42136d",
+  "solana-web3.iife.min.js": "a759deca1b65df140e8dda5ad8645c19579536bf822e5c0c7e4adb7793a5bd08"
+}

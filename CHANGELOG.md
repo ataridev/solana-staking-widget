@@ -3,6 +3,31 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-06-28
+
+### Security
+- Widget: render the wallet-supplied icon via an `img.src` property and the wallet
+  name via `textContent` instead of `innerHTML` string concatenation, closing an
+  attribute-breakout XSS (`data:image/png" onerror=…`) that slipped past the
+  prefix-only `data:image/` check.
+- Proxies: reject requests that carry no `Origin`/`Referer` (previously allowed
+  through), so the proxy can no longer be used as an open relay to your RPC key.
+
+### Added
+- PHP proxy: per-IP fixed-window rate limit (`429` + `Retry-After`), with a
+  reverse-proxy-aware `client_ip()` that trusts `X-Forwarded-For` only behind a
+  loopback proxy. Tune via `RATE_MAX` / `RATE_WINDOW`.
+- Supply-chain guard: `vendor/checksums.json` pins the SHA-256 of the vendored
+  `@solana/web3.js` and Buffer blobs; `build.js` verifies them before bundling
+  (and fails CI on mismatch).
+
+### Changed
+- **Breaking (misconfigured deploys):** the Cloudflare Worker and Vercel Edge
+  proxies now **fail closed** — if `ALLOWED_ORIGINS` is unset they reject every
+  request instead of allowing all origins. Set `ALLOWED_ORIGINS` to your domain(s)
+  to restore service. Rate limiting for the edge proxies is delegated to the
+  platform (Cloudflare Rate Limiting Rules / Vercel WAF), documented in each file.
+
 ## [1.0.0] - 2026-06-17
 
 ### Added

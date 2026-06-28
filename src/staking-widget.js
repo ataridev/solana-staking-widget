@@ -153,6 +153,25 @@
     if (html != null) n.innerHTML = html;
     return n;
   }
+  // Turn a TRUSTED static SVG string into a real node (no wrapper) so it can sit
+  // beside untrusted, text-only values without using innerHTML on them.
+  function svgNode(svg) {
+    var t = document.createElement('template');
+    t.innerHTML = svg;
+    return t.content.firstChild;
+  }
+  // Wallet-supplied icon. Set as a DOM property (never string-concatenated into an
+  // attribute), so a crafted value like `data:image/png" onerror=...` — which slips
+  // past the prefix-only data:image/ check — cannot break out and inject markup.
+  function walletIconNode(icon) {
+    if (icon) {
+      var img = document.createElement('img');
+      img.src = icon;
+      img.alt = '';
+      return img;
+    }
+    return svgNode(WALLET_ICON);
+  }
   function fmtSol(lamports, dp) {
     return (Number(lamports) / LAMPORTS).toLocaleString('en-US', { maximumFractionDigits: dp == null ? 4 : dp });
   }
@@ -579,8 +598,11 @@
     } else {
       var row = el('div', 'sw-wallet-row');
       wallets.forEach(function (w) {
-        var iconHtml = w.icon ? '<img src="' + w.icon + '" alt="" />' : WALLET_ICON;
-        var btn = el('button', 'sw-btn sw-btn-wallet', iconHtml + '<span>' + escapeHtml(w.name) + '</span>');
+        var btn = el('button', 'sw-btn sw-btn-wallet');
+        btn.appendChild(walletIconNode(w.icon));
+        var label = document.createElement('span');
+        label.textContent = w.name;            // text only — no markup injection
+        btn.appendChild(label);
         btn.addEventListener('click', function () { self.connect(w); });
         row.appendChild(btn);
       });
@@ -612,9 +634,11 @@
 
     var head = el('div', 'sw-head');
     var info = el('div', 'sw-wallet-info');
-    info.innerHTML = (this.walletIcon ? '<img src="' + this.walletIcon + '" alt="">' : WALLET_ICON) +
-      '<span class="sw-wi-name">' + escapeHtml(this.walletName) + '</span>' +
-      '<span class="sw-wi-addr">' + shorten(this.pubkey.toBase58()) + '</span>';
+    info.appendChild(walletIconNode(this.walletIcon));
+    var nameEl = el('span', 'sw-wi-name'); nameEl.textContent = this.walletName;
+    var addrEl = el('span', 'sw-wi-addr'); addrEl.textContent = shorten(this.pubkey.toBase58());
+    info.appendChild(nameEl);
+    info.appendChild(addrEl);
     var copy = el('button', 'sw-wi-copy', COPY_ICON);
     copy.title = 'Copy address';
     copy.setAttribute('aria-label', 'Copy wallet address');
