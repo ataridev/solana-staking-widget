@@ -8,6 +8,11 @@
  * Environment variables (Vercel project settings):
  *   SOLANA_RPC_ENDPOINT   your provider URL (with key)
  *   ALLOWED_ORIGINS       comma-separated, e.g. "https://example.com,https://www.example.com"
+ *                         REQUIRED: if unset the proxy fails closed (rejects all),
+ *                         so a misconfigured deploy can't become an open proxy.
+ *
+ * Rate limiting: the edge runtime is stateless — enforce per-IP limits at the
+ * platform (Vercel WAF / Firewall rules) or back a counter with a KV store.
  */
 
 export const config = { runtime: 'edge' };
@@ -25,7 +30,10 @@ const MAX_BATCH = 10;
 export default async function handler(request) {
   const allowed = (process.env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
   const origin = request.headers.get('Origin') || '';
-  const originOk = !origin || !allowed.length || allowed.includes(origin);
+  // Fail closed: require ALLOWED_ORIGINS to be configured AND a present, allowlisted
+  // Origin. An unset allowlist or a bare (no-Origin) request is rejected, so a
+  // misconfigured deploy can't leak RPC credits as an open proxy.
+  const originOk = allowed.length > 0 && !!origin && allowed.includes(origin);
 
   // CORS headers for allowed cross-origin callers (e.g. an embed on another domain).
   const cors = (origin && originOk) ? { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin' } : {};

@@ -9,11 +9,27 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const root = __dirname;
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
 const pkg = JSON.parse(read('package.json'));
+
+// Supply-chain guard: verify the vendored deps against their pinned SHA-256 before
+// bundling them into a transaction-signing UI. A tampered or swapped blob fails here
+// (and in CI) instead of shipping silently.
+const checksums = JSON.parse(read('vendor/checksums.json'));
+for (const [name, expected] of Object.entries(checksums)) {
+  if (name.startsWith('_')) continue;
+  const buf = fs.readFileSync(path.join(root, 'vendor', name));
+  const actual = crypto.createHash('sha256').update(buf).digest('hex');
+  if (actual !== expected) {
+    console.error(`Checksum mismatch for vendor/${name}\n  expected ${expected}\n  actual   ${actual}`);
+    process.exit(1);
+  }
+}
+console.log('Vendor checksums OK');
 
 const banner =
 `/*!
